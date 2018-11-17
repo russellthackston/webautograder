@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	</head>
 	
 	<body>
+		<?php require('nav.php'); ?>
 		<?php if ($html) { ?>
 			<h1>HTML</h1>
 			<pre><?php echo(htmlentities($formatted_html)); ?></pre>
@@ -116,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			<label for="assignment">Assignment:</label>
 			<select name="assignment" id="assignment">
 				<?php foreach ($assignments as $assignment) { ?>
-					<option value="<?php echo htmlentities($assignment->id); ?>" <?php if ($assignmentid == $assignment->id) { echo " selected "; } ?>><?php echo htmlentities($assignment->name); ?></option>
+					<option value="<?php echo htmlentities($assignment->id); ?>" <?php if (isset($assignmentid) && $assignmentid == $assignment->id) { echo " selected "; } ?>><?php echo htmlentities($assignment->name); ?></option>
 				<?php } ?>
 			</select>
 			<br>

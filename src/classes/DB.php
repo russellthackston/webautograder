@@ -108,6 +108,21 @@ class DB {
 
 	}
 	
+	public function deleteSession($sessionid) {
+	
+		if (isset($sessionid) && $sessionid != null) {
+			$sql = "DELETE FROM sessions WHERE expires < NOW() OR sessionid = :id";
+			$stmt = $this->dbh->prepare($sql);
+			$stmt->bindParam(':id', $sessionid);
+			$stmt->execute();
+		} else {
+			$sql = "DELETE FROM sessions WHERE expires < NOW()";
+			$stmt = $this->dbh->prepare($sql);
+			$stmt->execute();
+		}
+
+	}
+	
 	public function getSessionByIndex($index) {
 	
 		$session = NULL;

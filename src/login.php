@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	</head>
 	
 	<body>
+		<?php require('nav.php'); ?>
 		<?php if ($loginAttempt && ($user == NULL || !$goodPassword)) { ?>
 			<div>Login failed.</div>
 		<?php } ?>

@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	</head>
 	
 	<body>
+		<?php require('nav.php'); ?>
 		<?php if ($registerAttempt && $user == NULL) { ?>
 			<?php if ($duplicateUsername) { ?>
 			<div>Username already registered.</div>
