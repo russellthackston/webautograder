@@ -8,6 +8,7 @@ class Check {
 	public $type;
 	public $nodes;
 	private $documentSet = false;
+	public $errors;
 
 	function __construct($id, $name, $description, $xpath, $type) {
 		if (empty($id)) {
@@ -30,11 +31,17 @@ class Check {
 		$this->description = $description;
 		$this->xpath = $xpath;
 		$this->type = $type;
+		$this->errors = array();
    	}
 
     public function setDocument($html) {
 		$doc = new DOMDocument();
+		libxml_use_internal_errors(true);
 		$doc->loadHTML($html);
+		foreach (libxml_get_errors() as $error) {
+			$this->errors[] = $error;
+		}
+		libxml_clear_errors();
 		$xp = new DOMXPath($doc);
 		$nodes = $xp->query($this->xpath);
 		$this->nodes = $nodes;

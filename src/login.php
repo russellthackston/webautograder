@@ -6,23 +6,27 @@ error_reporting(E_ALL);
 
 require_once('autoloader.php');
 $db = new DB();
-$registerAttempt = FALSE;
+$loginAttempt = FALSE;
 $user = NULL;
-$duplicateUsername = FALSE;
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
-	$registerAttempt = TRUE;
+	$loginAttempt = TRUE;
 	$username = $_POST['username'];
 	$password = $_POST['password'];
-	$studentid = $_POST['studentid'];
 	
 	try {
-		$user = $db->registerUser($username, $password, $studentid);
-	} catch( PDOException $e ) {
-		if ($e->errorInfo[1] == 1062) {
-			$duplicateUsername = TRUE;
+		$user = $db->getUserByUsername($username);
+		$passwordhash = $user->passwordhash;
+		$goodPassword = password_verify($password, $passwordhash);
+		if ($goodPassword) {
+			$session = $db->newSession($user->id);
+			setcookie('wag_sessionid', $session->id, time()+(3600*24*120));
+			header('Location: index.php');
+			exit();
+
 		}
+	} catch( PDOException $e ) {
 		$user = NULL;
 	}
 }
@@ -40,27 +44,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	</head>
 	
 	<body>
-		<?php if ($registerAttempt && $user == NULL) { ?>
-			<?php if ($duplicateUsername) { ?>
-			<div>Username already registered.</div>
-			<?php } else { ?>
-			<div>Registration failed.</div>
-			<?php } ?>
+		<?php if ($loginAttempt && ($user == NULL || !$goodPassword)) { ?>
+			<div>Login failed.</div>
 		<?php } ?>
-		<?php if ($registerAttempt && $user != NULL) { ?>
-			<div>Thank you for registering. You may now <a href="login.php">login</a>.</div>
+		<?php if ($loginAttempt && $user != NULL && $goodPassword) { ?>
+			<div>Login successful.</div>
 		<?php } ?>
-		<form action="register.php" method="post" name="register">
+		<form action="login.php" method="post" name="login">
 			<label for="username">Username:</label>
 			<input type="text" name="username" id="username">
 			<br>
 			<label for="username">Password:</label>
 			<input type="password" name="password" id="password">
 			<br>
-			<label for="studentid">Student ID:</label>
-			<input type="text" name="studentid" id="studentid">
-			<br>
-			<input type="submit" name="register" id="register" value="Register">
+			<input type="submit" name="login" id="login" value="Login">
 		</form>
 	</body>
 </html>

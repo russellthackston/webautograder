@@ -6,9 +6,18 @@ error_reporting(E_ALL);
 
 require_once('autoloader.php');
 
-$errors = array();
-
 $db = new DB();
+
+if (!isset($_COOKIE['wag_sessionid'])) {
+	header('Location: login.php');
+	exit();
+}
+$session = $db->getSessionBySessionID($_COOKIE['wag_sessionid']);
+if ($session == NULL) {
+	header('Location: login.php');
+	exit();
+}
+
 $assignments = $db->getAssignments();
 
 $html = FALSE;
@@ -16,12 +25,25 @@ $html = FALSE;
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	$assignmentid = $_POST['assignment'];
+	
 	$assignment = $db->getAssignment($assignmentid);
 	$htmlFile = $_FILES['submission'];
 	$html = file_get_contents($htmlFile['tmp_name']);
 
 	$format = new Format();
 	$formatted_html = $format->HTML($html);
+	$assignment->setDocument($formatted_html);
+	$allpassed = TRUE;
+	$countPassed = 0;
+	foreach ($assignment->checks as $check) {
+		if (!$check->check()) {
+			$allpassed = FALSE;
+		} else {
+			$countPassed++;
+		}
+	}
+	$assignmentgrade = 100 * $countPassed / sizeof($assignment->checks);
+	$grades = $db->saveResults($session->userid, $assignment->id, $assignmentgrade);
 
 }
 
@@ -38,31 +60,69 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	</head>
 	
 	<body>
-		<?php if (!$html) { ?>
-			<form action="index.php" method="post" name="grade" enctype="multipart/form-data" >
-				<input type="file" name="submission" id="submission" required>
-				<br>
-				<select name="assignment">
-					<?php foreach ($assignments as $assignment) { ?>
-						<option value="<?php echo htmlentities($assignment->id); ?>"><?php echo htmlentities($assignment->name); ?></option>
-					<?php } ?>
-				</select>
-				<br>
-				<input type="submit" name="gradeit" id="gradeit">
-			</form>
-		<?php } else { ?>
+		<?php if ($html) { ?>
 			<h1>HTML</h1>
 			<pre><?php echo(htmlentities($formatted_html)); ?></pre>
+			<?php if (sizeof($assignment->checks[0]->errors) > 0) { ?>
+				<h1>Parsing errors and warnings</h1>
+				<?php foreach ($assignment->checks[0]->errors as $error) { ?>
+					<div>
+						<?php 
+							$severity = "";
+							switch ($error->level) { 
+								case LIBXML_ERR_WARNING:
+									$severity = "Warning";
+									break;
+								case LIBXML_ERR_ERROR:
+									$severity = "Error";
+									break;
+								case LIBXML_ERR_FATAL:
+									$severity = "Fatal";
+									break;
+							}
+						?>
+						<?php echo($severity); ?> : <?php echo($error->message); ?> on Line  <?php echo($error->line); ?>.
+					</div>
+				<?php } ?>
+			<?php } ?>
 			<h1>Checks for <?php echo htmlentities($assignment->name); ?></h1>
-			<?php foreach ($assignment->checks as $check) { 
-				$check->setDocument($formatted_html);
-			?>
+			<?php foreach ($assignment->checks as $check) { ?>
 			<div>
-				<h2><?php echo $check->name; ?></h2>
-				<?php if ($check->check()) { echo "Passed"; } else { echo "Failed - " . $check->description; } ?>
+				<h2><?php echo htmlentities($check->name); ?></h2>
+				<?php if ($check->check()) { echo "Passed"; } else { echo "Failed - " . htmlentities($check->description); } ?>
 			</div>
 			<?php } ?>
+			<hr>
+			<?php if ($allpassed) { ?>
+				<div>All tests passed.</div>
+			<?php } ?>
+			<h2>Submissions</h2>
+			<table>
+			<?php foreach ($grades as $grade) { ?>
+				<tr>
+					<td><?php echo($grade->submitted); ?></td>
+					<td><?php echo($grade->assignment->name); ?></td>
+					<td><?php echo($grade->grade); ?>%</td>
+				</tr>
+			<?php } ?>
+			</table>
+			<hr>
 		<?php } ?>
+		<h1>Check assignment</h1>
+		<form action="index.php" method="post" name="grade" enctype="multipart/form-data" >
+			<label for="submission">Your file:</label>
+			<input type="file" name="submission" id="submission" required>
+			<br>
+			<label for="assignment">Assignment:</label>
+			<select name="assignment" id="assignment">
+				<?php foreach ($assignments as $assignment) { ?>
+					<option value="<?php echo htmlentities($assignment->id); ?>" <?php if ($assignmentid == $assignment->id) { echo " selected "; } ?>><?php echo htmlentities($assignment->name); ?></option>
+				<?php } ?>
+			</select>
+			<br>
+			<input type="submit" name="gradeit" id="gradeit" value="Submit Assignment">
+			<input type="hidden" name="thisaction" value="submitassignment">
+		</form>
 	</body>
 </html>
 

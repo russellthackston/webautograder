@@ -31,6 +31,12 @@ class Assignment {
 		$this->createdby = $createdby;
 		$this->checks = array();
    	}
+   	
+   	function setDocument($html) {
+	   	foreach($this->checks as $check) {
+		   	$check->setDocument($html);
+	   	}
+   	}
 
    	public static function fromArray($ary) {
 	   	return new Assignment($ary['assignmentid'], $ary['name'], $ary['description'], $ary['example'], $ary['createdby']);
