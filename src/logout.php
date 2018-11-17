@@ -8,7 +8,7 @@ require_once('autoloader.php');
 $db = new DB();
 
 if (isset($_COOKIE['wag_sessionid'])) {
-	$sessionid = $_COOKIE['wag_sessionid']);
+	$sessionid = $_COOKIE['wag_sessionid'];
 	$db->deleteSession($sessionid);
 }
 
