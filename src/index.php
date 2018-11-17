@@ -4,24 +4,23 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once('format.php');
-require_once('db.php');
-require_once('classes/Assignment.php');
+require_once('autoloader.php');
 
 $errors = array();
 
-$assignments = getAssignments();
+$db = new DB();
+$assignments = $db->getAssignments();
 
 $html = FALSE;
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	$assignmentid = $_POST['assignment'];
-	$assignment = getAssignment($assignmentid);
+	$assignment = $db->getAssignment($assignmentid);
 	$htmlFile = $_FILES['submission'];
 	$html = file_get_contents($htmlFile['tmp_name']);
 
-	$format = new Format;
+	$format = new Format();
 	$formatted_html = $format->HTML($html);
 
 }
@@ -41,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	<body>
 		<?php if (!$html) { ?>
 			<form action="index.php" method="post" name="grade" enctype="multipart/form-data" >
-				<input type="file" name="submission" id="submission">
+				<input type="file" name="submission" id="submission" required>
 				<br>
 				<select name="assignment">
 					<?php foreach ($assignments as $assignment) { ?>

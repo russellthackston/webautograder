@@ -9,7 +9,7 @@ final class UserTest extends TestCase {
 		Test class definition
 	*/	
 	public function testClassDefinition() : void {
-		$obj = new User("id","name","passwordhash","email");
+		$obj = new User("id","name","passwordhash","studentid");
 		$this->assertTrue(
 			method_exists($obj, 'fromArray'), 
 			'Class does not have method fromArray'
@@ -29,30 +29,30 @@ final class UserTest extends TestCase {
 	*/	
 	public function testConstructor() : void {
 		
-		$obj = new User("id","username","passwordhash","email");
+		$obj = new User("id","username","passwordhash","studentid");
 		$this->assertEquals('id', $obj->id);
 		$this->assertEquals('username', $obj->username);
 		$this->assertEquals('passwordhash', $obj->passwordhash);
-		$this->assertEquals('email', $obj->email);
+		$this->assertEquals('studentid', $obj->studentid);
 
 	}
 
 	public function testConstructorEmptyID() : void {
 		$this->expectException(Exception::class);
-		$obj = new User("","username","passwordhash","email");
+		$obj = new User("","username","passwordhash","studentid");
 	}
 
 	public function testConstructorEmptyUsername() : void {
 		$this->expectException(Exception::class);
-		$obj = new User("id","","passwordhash","email");
+		$obj = new User("id","","passwordhash","studentid");
 	}
 
 	public function testConstructorEmptyPasswordHash() : void {
 		$this->expectException(Exception::class);
-		$obj = new User("id","username","","email");
+		$obj = new User("id","username","","studentid");
 	}
 
-	public function testConstructorEmptyEmail() : void {
+	public function testConstructorEmptystudentid() : void {
 		$this->expectException(Exception::class);
 		$obj = new User("id","username","passwordhash","");
 	}
@@ -62,11 +62,11 @@ final class UserTest extends TestCase {
 	*/	
 	public function testFromArray() : void {
 		
-		$obj = User::fromArray(["userid"=>"id","username"=>"name","passwordhash"=>"password","email"=>"mail"]);
+		$obj = User::fromArray(["userid"=>"id","username"=>"name","passwordhash"=>"password","studentid"=>"mail"]);
 		$this->assertEquals('id', $obj->id);
 		$this->assertEquals('name', $obj->username);
 		$this->assertEquals('password', $obj->passwordhash);
-		$this->assertEquals('mail', $obj->email);
+		$this->assertEquals('mail', $obj->studentid);
 	}
 
 	/*
@@ -75,20 +75,20 @@ final class UserTest extends TestCase {
 	public function testListFromArray() : void {
 		
 		$objs = User::listFromArray([
-			["userid"=>"id1","username"=>"name1","passwordhash"=>"password1","email"=>"mail1"],
-			["userid"=>"id2","username"=>"name2","passwordhash"=>"password2","email"=>"mail2"]
+			["userid"=>"id1","username"=>"name1","passwordhash"=>"password1","studentid"=>"mail1"],
+			["userid"=>"id2","username"=>"name2","passwordhash"=>"password2","studentid"=>"mail2"]
 		]);
 		$this->assertEquals(2, sizeof($objs));
 
 		$this->assertEquals('id1', $objs[0]->id);
 		$this->assertEquals('name1', $objs[0]->username);
 		$this->assertEquals('password1', $objs[0]->passwordhash);
-		$this->assertEquals('mail1', $objs[0]->email);
+		$this->assertEquals('mail1', $objs[0]->studentid);
 
 		$this->assertEquals('id2', $objs[1]->id);
 		$this->assertEquals('name2', $objs[1]->username);
 		$this->assertEquals('password2', $objs[1]->passwordhash);
-		$this->assertEquals('mail2', $objs[1]->email);
+		$this->assertEquals('mail2', $objs[1]->studentid);
 
 	}
 
@@ -97,15 +97,15 @@ final class UserTest extends TestCase {
 	*/
 	public function testSettersAndGetters() : void {
 		
-		$obj = new User("id","username","passwordhash","email");
+		$obj = new User("id","username","passwordhash","studentid");
 		$obj->id = "id";
 		$obj->username = "username";
 		$obj->passwordhash = "passwordhash";
-		$obj->email = "email";
+		$obj->studentid = "studentid";
 		$this->assertEquals('id', $obj->id);
 		$this->assertEquals('username', $obj->username);
 		$this->assertEquals('passwordhash', $obj->passwordhash);
-		$this->assertEquals('email', $obj->email);
+		$this->assertEquals('studentid', $obj->studentid);
 
 	}
 

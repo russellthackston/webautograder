@@ -4,9 +4,9 @@ class User {
 	public $id;
 	public $username;
 	public $passwordhash;
-	public $email;
+	public $studentid;
 
-	function __construct($id, $username, $passwordhash, $email) {
+	function __construct($id, $username, $passwordhash, $studentid) {
 		if (empty($id)) {
 			throw new Exception('User ID cannot be empty');
 		}
@@ -16,17 +16,17 @@ class User {
 		if (empty($passwordhash)) {
 			throw new Exception('Password hash cannot be empty');
 		}
-		if (empty($email)) {
-			throw new Exception('Email cannot be empty');
+		if (empty($studentid)) {
+			throw new Exception('Student ID cannot be empty');
 		}
 		$this->id = $id;
 		$this->username = $username;
 		$this->passwordhash = $passwordhash;
-		$this->email = $email;
+		$this->studentid = $studentid;
    	}
 
    	public static function fromArray($ary) {
-	   	return new User($ary['userid'], $ary['username'], $ary['passwordhash'], $ary['email']);
+	   	return new User($ary['userid'], $ary['username'], $ary['passwordhash'], $ary['studentid']);
     }
 
    	public static function listFromArray($ary) {
