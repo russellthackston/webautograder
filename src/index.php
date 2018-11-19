@@ -6,17 +6,12 @@ error_reporting(E_ALL);
 
 require_once('autoloader.php');
 
-$db = new DB();
+if(!Security::checkAccess(FALSE)) {
+	header('Location: login.php');
+	exit();
+}
 
-if (!isset($_COOKIE['wag_sessionid'])) {
-	header('Location: login.php');
-	exit();
-}
-$session = $db->getSessionBySessionID($_COOKIE['wag_sessionid']);
-if ($session == NULL) {
-	header('Location: login.php');
-	exit();
-}
+$db = new DB();
 
 $assignments = $db->getAssignments();
 

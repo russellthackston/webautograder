@@ -5,8 +5,9 @@ class User {
 	public $username;
 	public $passwordhash;
 	public $studentid;
+	public $isinstructor;
 
-	function __construct($id, $username, $passwordhash, $studentid) {
+	function __construct($id, $username, $passwordhash, $studentid, $isinstructor = FALSE) {
 		if (empty($id)) {
 			throw new Exception('User ID cannot be empty');
 		}
@@ -23,10 +24,11 @@ class User {
 		$this->username = $username;
 		$this->passwordhash = $passwordhash;
 		$this->studentid = $studentid;
+		$this->isinstructor = $isinstructor;
    	}
 
    	public static function fromArray($ary) {
-	   	return new User($ary['userid'], $ary['username'], $ary['passwordhash'], $ary['studentid']);
+	   	return new User($ary['userid'], $ary['username'], $ary['passwordhash'], $ary['studentid'], ($ary['isinstructor'] == 1));
     }
 
    	public static function listFromArray($ary) {

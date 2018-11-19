@@ -38,10 +38,59 @@ class DB {
 
 	}
 	
+	public function getAssignmentByIndex($index) {
+	
+		$assignment = null;
+		$sql = "SELECT * FROM assignments WHERE assignmentindex = :index";
+		$stmt = $this->dbh->prepare($sql);
+		$stmt->bindParam(':index', $index);
+		$stmt->execute();
+		$ary = $stmt->fetch();
+		$assignment = Assignment::fromArray($ary);
+		$assignment->checks = $this->getChecks($id);
+		return $assignment;
+
+	}
+	
+	public function addAssignment($name, $description, $html, $createdby) {
+	
+		$assignment = null;
+		$sql = "INSERT INTO assignments (assignmentid, name, description, example, createdby) VALUES(hex(random_bytes(16)), :name, :desc, :example, :createdby)";
+		$stmt = $this->dbh->prepare($sql);
+		$stmt->bindParam(':name', $name);
+		$stmt->bindParam(':desc', $description);
+		$stmt->bindParam(':example', $html);
+		$stmt->bindParam(':createdby', $createdby);
+		$stmt->execute();
+		if ($stmt->rowCount() == 1) {
+			$index = $this->dbh->lastInsertId();
+		}
+		return $this->getAssignmentByIndex($index);
+
+	}
+	
+	public function addCheck($name, $description, $xpath, $checktype, $assignmentid) {
+	
+		$sql = "INSERT INTO checks (checkid, name, description, xpath, checktype, assignmentid) " . 
+			"VALUES(hex(random_bytes(16)), :name, :desc, :xpath, :checktype, :assignmentid)";
+		$stmt = $this->dbh->prepare($sql);
+		$stmt->bindParam(':name', $name);
+		$stmt->bindParam(':desc', $description);
+		$stmt->bindParam(':xpath', $xpath);
+		$stmt->bindParam(':checktype', $checktype);
+		$stmt->bindParam(':assignmentid', $assignmentid);
+		$stmt->execute();
+		if ($stmt->rowCount() == 1) {
+			return TRUE;
+		}
+		return FALSE;
+
+	}
+	
 	public function getChecks($assignmentid) {
 
 		$checks = array();
-		$sql = "SELECT * FROM checks WHERE assignmentid = :id";
+		$sql = "SELECT * FROM checks WHERE assignmentid = :id ORDER BY checkindex";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bindParam(':id', $assignmentid);
 		$stmt->execute();
@@ -71,9 +120,24 @@ class DB {
 	public function getUserByUsername($username) {
 	
 		$user = NULL;
-		$sql = "SELECT userid, username, passwordhash, studentid FROM users WHERE username = :username";
+		$sql = "SELECT * FROM users WHERE username = :username";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bindParam(':username', $username);
+		$stmt->execute();
+		$ary = $stmt->fetchAll();
+		if (sizeof($ary) > 0) {
+			$user = User::fromArray($ary[0]);
+		}
+		return $user;
+
+	}
+	
+	public function getUserByID($userid) {
+	
+		$user = NULL;
+		$sql = "SELECT * FROM users WHERE userid = :userid";
+		$stmt = $this->dbh->prepare($sql);
+		$stmt->bindParam(':userid', $userid);
 		$stmt->execute();
 		$ary = $stmt->fetchAll();
 		if (sizeof($ary) > 0) {
@@ -126,7 +190,7 @@ class DB {
 	public function getSessionByIndex($index) {
 	
 		$session = NULL;
-		$sql = "SELECT sessionid, userid, expires FROM sessions WHERE sessionindex = :sessionindex AND expires > NOW()";
+		$sql = "SELECT * FROM sessions WHERE sessionindex = :sessionindex AND expires > NOW()";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bindParam(':sessionindex', $index);
 		$stmt->execute();
@@ -141,7 +205,7 @@ class DB {
 	public function getSessionBySessionID($sessionid) {
 	
 		$session = NULL;
-		$sql = "SELECT sessionid, userid, expires FROM sessions WHERE sessionid = :sessionid AND expires > NOW()";
+		$sql = "SELECT * FROM sessions WHERE sessionid = :sessionid AND expires > NOW()";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bindParam(':sessionid', $sessionid);
 		$stmt->execute();
@@ -172,7 +236,7 @@ class DB {
 	public function getResultsByUserID($userid) {
 
 		$grades = array();
-		$sql = "SELECT userid, assignmentid, grade, submitted FROM results WHERE userid = :id";
+		$sql = "SELECT * FROM results WHERE userid = :id";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bindParam(':id', $userid);
 		$stmt->execute();
@@ -191,7 +255,7 @@ class DB {
 	public function getResultsByUserIDAndAssignment($userid, $assignmentid) {
 
 		$grades = array();
-		$sql = "SELECT userid, assignmentid, grade, submitted FROM results WHERE userid = :id AND assignmentid = :assignmentid";
+		$sql = "SELECT * FROM results WHERE userid = :id AND assignmentid = :assignmentid";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bindParam(':id', $userid);
 		$stmt->bindParam(':assignmentid', $assignmentid);
