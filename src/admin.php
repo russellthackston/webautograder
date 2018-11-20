@@ -57,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		$description = $_POST['description'];
 		$xpath = $_POST['xpath'];
 		$checktype = $_POST['checktype'];
-		var_dump($_POST);
 		$assignmentid = $_POST['assignmentid'];
 
 		$result = $db->addCheck($name, $description, $xpath, $checktype, $assignmentid);
@@ -70,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
 	}
-
 
 }
 
@@ -102,8 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			<form action="admin.php" method="get" name="chooseassignmentform">
 				<label for="assignment">Assignment:</label>
 				<select name="id" id="assignment">
-					<?php foreach ($assignments as $assignment) { ?>
-						<option value="<?php echo htmlentities($assignment->id); ?>" <?php if (isset($assignmentid) && $assignmentid == $assignment->id) { echo " selected "; } ?>><?php echo htmlentities($assignment->name); ?></option>
+					<?php foreach ($assignments as $assign) { ?>
+						<option value="<?php echo htmlentities($assign->id); ?>" <?php if (isset($assignmentid) && $assignmentid == $assign->id) { echo " selected "; } ?>><?php echo htmlentities($assign->name); ?></option>
 					<?php } ?>
 				</select>
 				<input type="submit" name="chooseassignment" value="Load">

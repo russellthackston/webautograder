@@ -33,7 +33,7 @@ class Assignment {
    	}
    	
    	function setDocument($html) {
-	   	foreach($this->checks as $check) {
+	   	foreach($this->checks as &$check) {
 		   	$check->setDocument($html);
 	   	}
    	}
