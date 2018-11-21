@@ -85,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	</head>
 	
 	<body>
+		<?php require('nav.php'); ?>
 		<?php if (!isset($assignment)) { ?>
 			<h2>Add Assignment</h2>
 			<form action="admin.php" method="post" name="createassignmentform" enctype="multipart/form-data" >
