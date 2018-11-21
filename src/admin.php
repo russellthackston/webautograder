@@ -88,11 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		<?php if (!isset($assignment)) { ?>
 			<h2>Add Assignment</h2>
 			<form action="admin.php" method="post" name="createassignmentform" enctype="multipart/form-data" >
-				<input type="file" name="sample" id="sample">
+				Sample file: <input type="file" name="sample" id="sample">
 				<br>
-				<input type="text" name="name" id="name">
+				Name: <input type="text" name="name" id="name">
 				<br>
-				<input type="text" name="description" id="description">
+				Description: <input type="text" name="description" id="description">
 				<br>
 				<input type="submit" name="createassignment" id="createassignment" value="Create Assignment">
 			</form>
